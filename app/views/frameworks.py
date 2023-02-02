@@ -70,7 +70,18 @@ class FrameworkView(Resource):
 class FrameworkView(Resource):
     def get(self, language: str):
         try:
-            framework = db.session.query(Framework).filter(Framework.language == language).all()
-            return frameworks_schema.dump(framework), 200
+            # frameworks = Framework.language.like(language)
+            #
+            frameworks = db.session.query(Framework).filter(Framework.language == language).all()
+            #
+            # frame = db.session.query(Framework)
+            # frameworks = [fram for fram in frame if fram.language == language]
+            #
+            # frameworks = Framework.query.filter(language=language).all()
+            #
+            # language = request.args.get('language')
+            # frameworks = Framework.query.filter(language=language).all()
+
+            return frameworks_schema.dump(frameworks), 200
         except Exception:
             return "", 404

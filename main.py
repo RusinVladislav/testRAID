@@ -20,6 +20,7 @@ def configure_app(application: Flask):
     api.add_namespace(framework_ns)
 
 
+# для загрузки на сервер данную конструкцию необходимо убрать
 if __name__ == '__main__':
     app = create_app(Config())
     configure_app(app)
