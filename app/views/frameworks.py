@@ -1,20 +1,24 @@
 from flask import request
 from flask_restx import Resource, Namespace
 
+from app.container import framework_services
 from app.database import db
 from app.dao.models.framework import FrameworkSchema, Framework
 
 framework_ns = Namespace('frameworks')
 
 framework_schema = FrameworkSchema()
-frameworks_schema = FrameworkSchema(many=True)
 
 
 @framework_ns.route('/')
-class FrameworksView(Resource):
+class PlacesView(Resource):
     def get(self):
-        all_frameworks = db.session.query(Framework).all()
-        return frameworks_schema.dump(all_frameworks), 200
+        language = request.args.get("language")
+        if language:
+            result = db.session.query(Framework).filter_by(language=language).all()
+            return framework_schema.dump(result, many=True), 200
+        else:
+            return framework_schema.dump(framework_services.get_all(), many=True), 200
 
     def post(self):
         req_json = request.json
@@ -64,24 +68,3 @@ class FrameworkView(Resource):
         db.session.delete(framework)
         db.session.commit()
         return "Framework delete", 204
-
-
-@framework_ns.route('/<language>')
-class FrameworkView(Resource):
-    def get(self, language: str):
-        try:
-            # frameworks = Framework.language.like(language)
-            #
-            frameworks = db.session.query(Framework).filter(Framework.language == language).all()
-            #
-            # frame = db.session.query(Framework)
-            # frameworks = [fram for fram in frame if fram.language == language]
-            #
-            # frameworks = Framework.query.filter(language=language).all()
-            #
-            # language = request.args.get('language')
-            # frameworks = Framework.query.filter(language=language).all()
-
-            return frameworks_schema.dump(frameworks), 200
-        except Exception:
-            return "", 404
